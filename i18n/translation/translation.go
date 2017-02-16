@@ -33,12 +33,12 @@ func (a SortableByID) Less(i, j int) bool { return a[i].ID() < a[j].ID() }
 // data["id"] must be a string and data["translation"] must be either a string
 // for a non-plural translation or a map[string]interface{} for a plural translation.
 func NewTranslation(data map[string]interface{}) (Translation, error) {
-	id, ok := data["id"].(string)
+	id, ok := data["term"].(string)
 	if !ok {
-		return nil, fmt.Errorf(`missing "id" key`)
+		return nil, fmt.Errorf(`missing "term" key`)
 	}
 	var pluralObject map[string]interface{}
-	switch translation := data["translation"].(type) {
+	switch translation := data["definition"].(type) {
 	case string:
 		tmpl, err := newTemplate(translation)
 		if err != nil {
@@ -58,9 +58,9 @@ func NewTranslation(data map[string]interface{}) (Translation, error) {
 	case map[string]interface{}:
 		pluralObject = translation
 	case nil:
-		return nil, fmt.Errorf(`missing "translation" key`)
+		return nil, fmt.Errorf(`missing "definition" key`)
 	default:
-		return nil, fmt.Errorf(`unsupported type for "translation" key %T`, translation)
+		return nil, fmt.Errorf(`unsupported type for "definition" key %T`, translation)
 	}
 
 	templates := make(map[language.Plural]*template, len(pluralObject))
